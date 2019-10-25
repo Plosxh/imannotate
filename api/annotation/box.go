@@ -1,9 +1,17 @@
 package annotation
 
-import "github.com/smileinnovation/imannotate/api/project"
+import (
+	"github.com/smileinnovation/imannotate/api/project"
+)
 
 type Annotation struct {
 	Image string `json:"image" bson:"image"`
+	Boxes []*Box `json:"boxes" bson:"boxes"`
+}
+
+type AnnotedImage struct {
+	Image string `json:"image" bson:"image"`
+	Url string `json:"url" bson:"url"`
 	Boxes []*Box `json:"boxes" bson:"boxes"`
 }
 

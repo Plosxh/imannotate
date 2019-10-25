@@ -2,16 +2,15 @@ package mongo
 
 import (
 	"errors"
-	"io"
-	"io/ioutil"
-	"log"
-
 	"github.com/globalsign/mgo"
 	"github.com/smileinnovation/imannotate/api/annotation"
 	"github.com/smileinnovation/imannotate/api/annotation/exporter"
 	"github.com/smileinnovation/imannotate/api/project"
 	"github.com/smileinnovation/imannotate/api/user"
 	"github.com/smileinnovation/imannotate/app/registry"
+	"io"
+	"io/ioutil"
+	"log"
 
 	"github.com/globalsign/mgo/bson"
 )
@@ -143,12 +142,12 @@ func (mpp *MongoProjectProvider) Update(p *project.Project) error {
 	return db.C("project").UpdateId(id, p)
 }
 
-func (mpp *MongoProjectProvider) NextImage(prj *project.Project) (string, string, error) {
+func (mpp *MongoProjectProvider) NextImage(prj *project.Project) (string, string, map[int][]string, error) {
 	provider := registry.GetProvider(prj)
 	if provider == nil {
-		return "", "", errors.New("No image provider given for the project named " + prj.Name)
+		return "", "", make(map[int][]string), errors.New("No image provider given for the project named " + prj.Name)
 	}
-	name, url, err := provider.GetImage()
+	name, url, csv,err := provider.GetImage()
 
 	// check if image already annotated
 	if ann, err := annotation.GetImage(prj, name); err == nil && ann != nil {
@@ -159,7 +158,7 @@ func (mpp *MongoProjectProvider) NextImage(prj *project.Project) (string, string
 		gc.Collect(name, url)
 	}
 
-	return name, url, err
+	return name, url, csv, err
 }
 
 func (mpp *MongoProjectProvider) AddImage(prj *project.Project, name string, reader io.Reader) error {

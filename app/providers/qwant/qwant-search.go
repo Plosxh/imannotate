@@ -47,18 +47,19 @@ func NewQwant(req string) *Qwant {
 	return &q
 }
 
-func (q *Qwant) fetch() (string, string, error) {
-
+func (q *Qwant) fetch() (string, string, map[int][]string, error) {
+	var boxes map[int][]string
 	if i, ok := <-q.hit; ok {
 		// we should not return "name" because we must save "image url"
 		// on annotation database to retrieve image source
-		return i["url"], i["url"], nil
+		return i["url"], i["url"], boxes, nil
 	} else {
-		return "", "", providers.NoMoreFileError{}
+		return "", "", boxes, providers.NoMoreFileError{}
 	}
 }
 
-func (q *Qwant) GetImage() (string, string, error) {
+func (q *Qwant) GetImage() (string, string, map[int][]string, error) {
+
 	return q.fetch()
 }
 

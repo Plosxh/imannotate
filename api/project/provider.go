@@ -2,6 +2,7 @@ package project
 
 import (
 	"io"
+	"log"
 
 	"github.com/smileinnovation/imannotate/api/user"
 )
@@ -23,7 +24,7 @@ type ProjectManager interface {
 	Update(*Project) error
 
 	// NextImage return next image name and url to annotate for a given project.
-	NextImage(*Project) (string, string, error)
+	NextImage(*Project) (string, string, map[int][]string, error)
 
 	// AddImage allow to add an image to be annotated. This method is optional.
 	// Commonly used to inject image in ImageProvider when you need to manage
@@ -72,7 +73,8 @@ func Update(p *Project) error {
 	return provider.Update(p)
 }
 
-func NextImage(p *Project) (string, string, error) {
+func NextImage(p *Project) (string, string, map[int][]string, error) {
+	log.Println(p.ImageProvider)
 	return provider.NextImage(p)
 }
 

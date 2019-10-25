@@ -5,9 +5,11 @@ import { Project } from '@app/classes/project';
 import { Annotator } from '@app/classes/annotator';
 import { BoundingBox } from '@app/classes/boundingbox';
 import { Annotation } from '@app/classes/annotation';
-import { ImageResult } from "@app/classes/imageresult";
+import { ImageResult } from '@app/classes/imageresult';
 
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import {Annotatedimage} from '@app/classes/annotatedimage';
+import {forEach} from '@angular/router/src/utils/collection';
 
 @Component({
   selector: 'app-annotator',
@@ -56,8 +58,8 @@ export class AnnotatorComponent implements OnInit {
     if ((this.currentBox.width - this.currentBox.x) * this.annotator.canvas.clientWidth < 20 ||
         (this.currentBox.height - this.currentBox.y) * this.annotator.canvas.clientHeight < 20
     ) {
-      alert("Box too small !")
-      return
+      alert('Box too small !');
+      return;
     }
 
     this.currentBox.label = label;
@@ -74,7 +76,7 @@ export class AnnotatorComponent implements OnInit {
     annotation.boxes = this.boxes;
     console.log(annotation);
     this.projectService.saveAnnotation(this.project, annotation).subscribe(ann => {
-      console.log("saved:", ann);
+      console.log('saved:', ann);
       this.nextImage();
     });
   }
@@ -82,10 +84,10 @@ export class AnnotatorComponent implements OnInit {
   saveEmptyAnnotation(content) {
     this.modalService.open(content, {}).result.then(
       result => {
-        console.log("result", result);
+        console.log('result', result);
       },
       reason => {
-        console.log("reason", reason);
+        console.log('reason', reason);
       }
     );
   }
@@ -93,10 +95,29 @@ export class AnnotatorComponent implements OnInit {
   nextImage() {
     // TODO: send box to server before to get next image
     this.projectService.getNextImage().subscribe(image => {
-      console.log(image)
-      this.image = image;
+      console.log(image);
+      this.image = new ImageResult(image.image, image.url);
       this.boxes = new Array<BoundingBox>();
-      this.annotator.loadImage(image.url);
+      console.log('gonna load img');
+
+      this.annotator.loadImage(image, this);
+     /* image.boxes.forEach(box => {
+        const mybox = new BoundingBox(box.x, box.y, box.width, box.height);
+        this.currentBox = mybox;
+        console.log('gonna set Label');
+        // this.setLabel(box.label);
+         mybox.label = box.label;
+         this.boxes.push(mybox);
+      });
+         this.annotator.setBoundingBoxes(this.boxes);
+      // this.annotator.drawBoundingBoxes()
+      */
+      console.log('the image url : ');
+      console.log(this.image.url);
+      console.log('the image name : ');
+      console.log(this.image.name);
+      console.log('the boxes after : ');
+      console.log(this.boxes);
     });
   }
 }

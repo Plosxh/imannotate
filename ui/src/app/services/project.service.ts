@@ -8,6 +8,7 @@ import { UserService } from '@app/services/user.service';
 import { Annotation } from "@app/classes/annotation";
 import { User } from "@app/classes/user";
 import { ImageResult } from "@app/classes/imageresult";
+import {Annotatedimage} from "@app/classes/annotatedimage";
 
 @Injectable()
 export class ProjectService {
@@ -57,8 +58,8 @@ export class ProjectService {
     return this.api.delete(`/v1/project/${project.id}/contributors/${user}`);
   }
 
-  getNextImage(): Observable<ImageResult> {
-    return this.api.get<ImageResult>('/v1/project/' + this.currentProject.id + '/next');
+  getNextImage(): Observable<Annotatedimage> {
+    return this.api.get<Annotatedimage>('/v1/project/' + this.currentProject.id + '/next');
   }
 
   // user id in the future

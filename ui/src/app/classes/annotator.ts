@@ -37,19 +37,29 @@ export class Annotator {
   }
 
   setBoundingBoxes(list: Array<BoundingBox>) {
+    console.log("this is the boxelist")
+    console.log(list)
     this.boxesList = list;
     this.boxInProgress = false;
     this.drawBoundingBoxes();
   }
 
-  loadImage(url) {
+  loadImage(img, annot) {
     const image = new Image();
     image.addEventListener('load', () => {
       this.createCanvas();
       this.reset();
       this.rescaleCanvas();
+      img.boxes.forEach(box => {
+        const mybox = new BoundingBox(box.x, box.y, box.width, box.height);
+        annot.currentBox = mybox;
+        console.log('gonna set Label');
+        annot.setLabel(box.label);
+        // mybox.label = box.label;
+        // annot.boxes.push(mybox);
+      });
     });
-    image.src = url;
+    image.src = img.url;
     this.image = image;
   }
 

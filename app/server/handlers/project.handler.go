@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/smileinnovation/imannotate/api/annotation"
@@ -68,13 +69,45 @@ func UpdateProject(c *gin.Context) {
 }
 
 func GetNextImage(c *gin.Context) {
-	p := project.Get(c.Param("name"))
-	name, image, _ := project.NextImage(p)
 
-	c.JSON(http.StatusOK, map[string]string{
+	log.Println("this is a toto test")
+	p := project.Get(c.Param("name"))
+	name, image, csv , _ := project.NextImage(p)
+	// should do stuff with annotation here
+	var boxes []*annotation.Box
+
+	if len(csv) != 0 {
+	for _, annot := range csv {
+		boxeX, _ := strconv.ParseFloat(annot[2], 64)
+		boxesY, _ := strconv.ParseFloat(annot[3], 64)
+		boxesW, _ := strconv.ParseFloat(annot[4], 64)
+		boxesH, _ := strconv.ParseFloat(annot[5], 64)
+		boxes= append(boxes, &annotation.Box{
+			Label: annot[1],
+			X:     boxeX,
+			Y:     boxesY,
+			W:     boxesW,
+			H:     boxesH,
+		})
+	}
+
+	}
+	MyAnnotation := annotation.AnnotedImage{
+		Image: name,
+		Url: image,
+		Boxes: boxes,
+	}
+	/*log.Println("this is the len of boxes : ", len(boxes))
+	for b:=0; b<len(boxes); b++ {
+		log.Println("boxe : ",b)
+		log.Println(boxes[b].Label)
+	}*/
+
+	/*c.JSON(http.StatusOK, map[string]string{
 		"name": name,
 		"url":  image,
-	})
+	})*/
+	c.JSON(http.StatusOK, MyAnnotation)
 }
 
 func SaveAnnotation(c *gin.Context) {
